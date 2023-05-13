@@ -16,5 +16,5 @@ func main() {
 		},
 	})
 	a.Handle()
-	a.Listen("localhost:8083")
+	a.Listen("server:8082")
 }

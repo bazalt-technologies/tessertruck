@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  server:
+    build: .
+    ports:
+      - 8082:8082
+    restart: always
