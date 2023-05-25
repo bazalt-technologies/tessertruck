@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"reflect"
 	"strconv"
 	"time"
 	"tracflow/pkg/models"
@@ -29,7 +30,18 @@ func (api *API) InfoHandler(w http.ResponseWriter, r *http.Request) {
 
 func infoWriter(conn *websocket.Conn, id int) {
 	for {
+		rule := models.Rule{}
 		info := models.Randomize(id)
+		if reflect.ValueOf(&info).Elem().FieldByName(rule.FieldName).CanInt() {
+			if int(reflect.ValueOf(&info).Elem().FieldByName(rule.FieldName).Int()) > rule.ValInt {
+				log.Println("err")
+			}
+		}
+		if reflect.ValueOf(&info).Elem().FieldByName(rule.FieldName).CanFloat() {
+			if reflect.ValueOf(&info).Elem().FieldByName(rule.FieldName).Float() > rule.ValFloat {
+				log.Println("err")
+			}
+		}
 		data, err := json.Marshal(info)
 		if err != nil {
 			log.Println(err.Error())

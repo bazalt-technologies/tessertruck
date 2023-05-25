@@ -3,14 +3,30 @@ package models
 type Info struct {
 	ID              int
 	Name            string
-	SpeedRT         float32
+	SpeedRT         float64
 	EngineRPS       int
-	FuelLevel       float32
-	FuelSpent       float32
-	FuelConsumption float32
+	FuelLevel       float64
+	FuelSpent       float64
+	FuelConsumption float64
 	EngineRegime    int
-	OilTemperature  float32
-	EnvTemperature  float32
+	OilTemperature  float64
+	EnvTemperature  float64
 	RedLamp         bool
 	WarnLamp        bool
+}
+
+type Rule struct {
+	ID        int
+	Name      string
+	TruckID   int
+	FieldName string
+	ValInt    int
+	ValFloat  float64
+}
+
+type Note struct {
+	ID      int
+	TruckID int
+	Message string
+	Time    string
 }
