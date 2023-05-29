@@ -1,8 +1,12 @@
 package models
 
+type Tractor struct {
+	ID       int
+	Name     string
+	Teledata Info
+}
+
 type Info struct {
-	ID              int
-	Name            string
 	SpeedRT         float64
 	EngineRPS       int
 	FuelLevel       float64
@@ -13,20 +17,21 @@ type Info struct {
 	EnvTemperature  float64
 	RedLamp         bool
 	WarnLamp        bool
+	RulesWarnings   []string
 }
 
 type Rule struct {
 	ID        int
 	Name      string
-	TruckID   int
+	TractorID int
 	FieldName string
 	ValInt    int
 	ValFloat  float64
 }
 
 type Note struct {
-	ID      int
-	TruckID int
-	Message string
-	Time    string
+	ID        int
+	TractorID int
+	Message   string
+	Time      string
 }

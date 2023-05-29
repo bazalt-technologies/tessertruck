@@ -1,8 +1,30 @@
 version: "3"
 
 services:
+  database:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB="truck"
+      - POSTGRES_USER="test"
+      - POSTGRES_PASSWORD="test"
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - ../2. Init Database:/docker-entrypoint-initdb.d
+      - .:/var/lib/postgresql/data
+    ports:
+      - "5430:5432"
   server:
     build: .
     ports:
-      - 8082:8082
+      - "8082:8082"
     restart: always
+    environment:
+      DB_NAME: "truck"
+      DB_PWD: "test"
+      DB_USER: "test"
+      DB_HOST: "database"
+      DB_PORT: 5432
+      SERVER_HOST: "server"
+      SERVER_PORT: 8085
+    depends_on:
+      - database
