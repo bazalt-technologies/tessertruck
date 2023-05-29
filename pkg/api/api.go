@@ -21,7 +21,7 @@ func (api *API) Handle() {
 	api.r.HandleFunc("/api/v1/info/{id}", api.InfoHandler)
 	api.r.HandleFunc("/api/v1/rules/{tractor_id}", api.RulesHandler).Methods(http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete)
 	api.r.HandleFunc("/api/v1/rules", api.RulesHandler).Methods(http.MethodPost, http.MethodPatch, http.MethodDelete)
-	api.r.HandleFunc("/api/v1/notes/{id}", api.NotesHandler).Methods(http.MethodGet)
+	api.r.HandleFunc("/api/v1/notes/{tractor_id}", api.NotesHandler).Methods(http.MethodGet)
 	api.r.HandleFunc("/api/v1/notes", api.NotesHandler).Methods(http.MethodPost, http.MethodPatch, http.MethodDelete)
 	api.r.HandleFunc("/api/v1/tractors", api.TractorsHandler).Methods(http.MethodGet, http.MethodPost)
 }
