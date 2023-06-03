@@ -99,7 +99,7 @@ func writeNote[T Num](rule models.Rule, t models.Tractor, val T, api *API) {
 	}
 
 	var mess string
-	switch val.(type) {
+	switch any(val).(type) {
 	case int:
 		mess = fmt.Sprintf("Нарушение для трактора #%s: значение %s превысил(-о) допустимые значения:%d вместо %d",
 			t.Name, field, val, rule.ValInt)

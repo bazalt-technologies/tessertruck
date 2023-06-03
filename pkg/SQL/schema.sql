@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS tractors (
     info jsonb
 );
 
-CREATE TABLE IF NOT EXISTS tractors (
+CREATE TABLE IF NOT EXISTS rules (
     id SERIAL PRIMARY KEY,
     tractor_id INTEGER NOT NULL REFERENCES tractors(id),
     name TEXT NOT NULL DEFAULT '',
