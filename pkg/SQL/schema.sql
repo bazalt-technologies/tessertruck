@@ -1,6 +1,9 @@
 CREATE TABLE IF NOT EXISTS tractors (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL DEFAULT '',
+    create_date TEXT NOT NULL DEFAULT '',
+    use_date TEXT NOT NULL DEFAULT '',
+    use_place TEXT NOT NULL DEFAULT '',
     info jsonb
 );
 

@@ -1,9 +1,12 @@
 package models
 
 type Tractor struct {
-	ID       int
-	Name     string
-	Teledata Info
+	ID         int
+	Name       string
+	CreateDate string
+	UseDate    string
+	UsePlace   string
+	Teledata   Info
 }
 
 type Info struct {
