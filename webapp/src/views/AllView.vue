@@ -2,8 +2,13 @@
 <div class="allContainer">
   <!-- Левая панель с тракторами -->
   <div class="tracsList">
-    <div class="title">
-      Тракторы:
+    <div class="upper-r-table">
+      <div class="title">
+        Тракторы:
+      </div>
+      <div>
+        <b-button variant="danger" class="upper-r-table-button" @click="showAddTracModal = true"><b-icon-plus-circle/></b-button>
+      </div>
     </div>
     <div>
       <ag-grid-vue
@@ -11,7 +16,7 @@
           :columnDefs="columns"
           :rowData="rows"
           :rowSelection="rowSelection"
-          style="width: 252px"
+          style="width: 682px"
           @selection-changed="onSelectionChanged()"
           @grid-ready="onGridReady"
       />
@@ -22,8 +27,8 @@
   <div class="tracInfo" v-if=" selectedTracID !== '' ">
     <div class="upper-r-table">
 
-      <div class="title" v-if="browserWidth > 1170">
-        Информация о тракторе №{{selectedTracID}} - {{selectedTracName}}:
+      <div class="title" v-if="browserWidth > 1380">
+        Трактор №{{selectedTracID}} - {{selectedTracName}}:
       </div>
       <div class="upper-r-table-btns">
         <b-button
@@ -40,13 +45,11 @@
       </div>
 
     </div>
-    <ag-grid-vue
-        class="ag-theme-balham"
-        :columnDefs="columnsInfo"
-        :rowData="rowsInfo"
-        style=" width: 100%"
-
-    />
+    <div>
+      <div class="infoField" v-for="item in columnsInfo" :key="item.field">
+        {{item.label}}: {{ rowsInfo[item.field] }} {{item.measure}}
+      </div>
+    </div>
   </div>
 
 
@@ -84,6 +87,46 @@
       class="inputField"
     />
   </b-modal>
+
+<!--  Модалка для добавления трактора-->
+  <b-modal
+      id="add-trac-modal"
+      v-model="showAddTracModal"
+      :title="'Добавить трактор'"
+      header-bg-variant="danger"
+      header-text-variant="light"
+      header-border-variant="danger"
+      footer-border-variant="danger"
+      ok-variant="success"
+      ok-title="Добавить"
+      cancel-title="Отменить"
+      hide-header-close
+      @ok="addTrac"
+  >
+    <b-alert variant="danger" :show="badInput">Все поля должны быть заполнены</b-alert>
+    <b-form-input
+        placeholder="Название"
+        v-model="newTrac.Name"
+        class="inputField"
+    />
+    <b-form-datepicker
+        placeholder="Дата создания"
+        v-model="newTrac.CreateDate"
+        class="inputField"
+        locale="ru"
+    />
+    <b-form-datepicker
+      placeholder="В эксплуатации с"
+      v-model="newTrac.UseDate"
+      class="inputField"
+      locale="ru"
+    />
+    <b-form-input
+        placeholder="Место эксплуатации"
+        v-model="newTrac.UsePlace"
+        class="inputField"
+    />
+  </b-modal>
 </div>
 </template>
 
@@ -91,6 +134,7 @@
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-balham.css";
 import {AgGridVue} from "ag-grid-vue";
+//import {url} from "@/main.js"
 export default {
   name: "AllView",
   components: {
@@ -98,6 +142,8 @@ export default {
   },
   data() {return {
     showAddRuleModal: false,
+    showAddTracModal: false,
+    connection: null,
     badInput: false,
     newRule: {
       id: 0,
@@ -108,74 +154,118 @@ export default {
       ValFloat: "",
       Val: null,
     },
+    newTrac: {
+      ID: 0,
+      Name: "",
+      CreateDate: "",
+      UseDate: "",
+      UsePlace: "",
+    },
     rowSelection: 'single',
     selectedTracID: '',
     selectedTracName: '',
     columns: [
-      {field: "id", headerName: 'Номер', sortable: true, width: 100},
-      {field: "name", headerName: 'Название', sortable: true, width: 150}
+      {field: "ID", headerName: 'Номер', sortable: true, width: 80},
+      {field: "Name", headerName: 'Название', sortable: true, width: 150},
+      {field: "CreateDate", headerName: 'Дата создания', sortable: true, width: 150},
+      {field: "UseDate", headerName: 'В эксплуатации с', sortable: true, width: 150},
+      {field: "UsePlace", headerName: 'Место эксплуатации', sortable: true, width: 150},
+
     ],
     rows: [
-      {id: 1, name: 'Трактор'},
-      {id: 2, name: 'Кировец'},
-      {id: 3, name: 'Череповец'},
-      {id: 4, name: 'Череповец1'},
-      {id: 5, name: 'Череповец2'},
-      {id: 6, name: 'Череповец3'},
-      {id: 7, name: 'Череповец4'},
-      {id: 8, name: 'Череповец5'},
-      {id: 9, name: 'Череповец6'},
-      {id: 10, name: 'Череповец7'},
-      {id: 11, name: 'Череповец8'},
-      {id: 12, name: 'Череповец9'},
-      {id: 13, name: 'Череповец10'},
-      {id: 14, name: 'Череповец11'},
-      {id: 15, name: 'Череповец12'},
-      {id: 16, name: 'Череповец13'},
-      {id: 17, name: 'Череповец14'},
-      {id: 18, name: 'Череповец15'},
-      {id: 19, name: 'Череповец16'},
-      {id: 20, name: 'Череповец17'},
-      {id: 21, name: 'Череповец18'},
-      {id: 22, name: 'Череповец19'},
+      {ID: 1, Name: 'Трактор', CreateDate: "10.05.2023", UseDate: "15.05.2023", UsePlace: "Тут"},
+      {ID: 2, Name: 'Кировец', CreateDate: "05.07.2019", UseDate: "29.07.2019", UsePlace: "Там"},
+      {ID: 3, Name: 'Череповец', CreateDate: "12.12.2020", UseDate: "20.01.2021", UsePlace: "Сям"},
     ],
     selectField: [
-      {text: "Выберите поле", value: null},
-      {text: "SpeedRT", value: "SpeedRT"},
-      {text: "EngineRPS", value: "EngineRPS"},
-      {text: "FuelLevel", value: "FuelLevel"},
-      {text: "FuelSpent", value: "FuelSpent"},
-      {text: "FuelConsumption", value: "FuelConsumption"},
-      {text: "EngineRegime", value: "EngineRegime"},
-      {text: "OilTemperature", value: "OilTemperature"},
-      {text: "EnvTemperature", value: "EnvTemperature"},
-      {text: "RedLamp", value: "RedLamp"},
-      {text: "WarnLamp", value: "WarnLamp"},
+      {value: null, text: "Выберите поле"},
+      {value: "SpeedRT", text: "Скорость"},
+      {value: "EngineRPS", text: "Оборотов в секунду"},
+      {value: "FuelLevel", text: "Уровень топлива"},
+      {value: "FuelSpent", text: "Потрачено топлива"},
+      {value: "FuelConsumption", text: "Расход топлива"},
+      {value: "EngineRegime", text: "Режим двигателя"},
+      {value: "OilTemperature", text: "Температура масла"},
+      {value: "EnvTemperature", text: "Внешняя температура"},
+      {value: "RedLamp", text: "Красный индикатор"},
+      {value: "WarnLamp", text: "Жёлтый индикатор"},
     ],
     columnsInfo: [
-      {field: "SpeedRT"},
-      {field: "EngineRPS"},
-      {field: "FuelLevel"},
-      {field: "FuelSpent"},
-      {field: "FuelConsumption"},
-      {field: "EngineRegime"},
-      {field: "OilTemperature"},
-      {field: "EnvTemperature"},
-      {field: "RedLamp"},
-      {field: "WarnLamp"},
+      {field: "SpeedRT", label: "Скорость", measure: "км/ч" },
+      {field: "EngineRPS", label: "Оборотов в секунду", measure: "" },
+      {field: "FuelLevel", label: "Уровень топлива", measure: "л" },
+      {field: "FuelSpent", label: "Потрачено топлива", measure: "л" },
+      {field: "FuelConsumption", label: "Расход топлива", measure: "л" },
+      {field: "EngineRegime", label: "Режим двигателя", measure: "" },
+      {field: "OilTemperature", label: "Температура масла", measure: "°С" },
+      {field: "EnvTemperature", label: "Внешняя температура", measure: "°С" },
+      {field: "RedLamp", label: "Красный индикатор", measure: "" },
+      {field: "WarnLamp", label: "Жёлтый индикатор", measure: "" },
     ],
-    rowsInfo: [],
+    wsData: {
+      ID: null,
+      Name: "",
+      Teledata: {
+        SpeedRT: [],
+        EngineRPS: [],
+        FuelLevel: [],
+        FuelSpent: [],
+        FuelConsumption: [],
+        EngineRegime: [],
+        OilTemperature: [],
+        EnvTemperature: [],
+        RedLamp: [],
+        WarnLamp: [],
+        RulesWarnings: [],
+      }
+    },
+    rowsInfo: {
+      SpeedRT: 0,
+      EngineRPS: 0,
+      FuelLevel: 0,
+      FuelSpent: 0,
+      FuelConsumption: 0,
+      EngineRegime: 0,
+      OilTemperature: 0,
+      EnvTemperature: 0,
+      RedLamp: 0,
+      WarnLamp: 0,
+    },
     browserWidth: 0,
     browserHeight: 0,
   }},
   created() {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+
   },
   onUnmounted() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
+
+    isIn(arr, str) {
+      for (let i = 0; i < arr.length; i++) {
+        if (str === arr[i]) {
+          return true
+        }
+      }
+      return false
+    },
+    setInfo(newData) {
+      let someData = JSON.parse(newData)
+      this.rowsInfo.SpeedRT = someData.Teledata.SpeedRT
+      this.rowsInfo.EngineRPS = someData.Teledata.EngineRPS
+      this.rowsInfo.FuelLevel = someData.Teledata.FuelLevel
+      this.rowsInfo.FuelSpent = someData.Teledata.FuelSpent
+      this.rowsInfo.FuelConsumption = someData.Teledata.FuelConsumption
+      this.rowsInfo.EngineRegime = someData.Teledata.EngineRegime
+      this.rowsInfo.OilTemperature = someData.Teledata.OilTemperature
+      this.rowsInfo.EnvTemperature = someData.Teledata.EnvTemperature
+      this.rowsInfo.RedLamp = someData.Teledata.RedLamp
+      this.rowsInfo.WarnLamp = someData.Teledata.WarnLamp
+      console.log(someData)
+    },
     isNumber(str) {
       if (str === null || str.length === 0) {
         return false
@@ -194,6 +284,28 @@ export default {
           this.newRule.FieldName !== null &&
           this.newRule.ValInt !== null &&
           this.isNumber(this.newRule.Val)
+    },
+    addTrac(bvModalEvent) {
+      bvModalEvent.preventDefault()
+      this.showAddTracModal = false
+      this.$http.post("http://localhost:8089/api/v1/tractors", this.newTrac).then(
+          // eslint-disable-next-line no-unused-vars
+          response=> {
+            this.newTrac.ID = 0
+            this.newTrac.Name = ""
+            this.newTrac.UseDate = ""
+            this.newTrac.UsePlace = ""
+            this.newTrac.CreateDate = ""
+            // eslint-disable-next-line no-unused-vars
+          }, err=> {
+            this.newTrac.ID = 0
+            this.newTrac.Name = ""
+            this.newTrac.UseDate = ""
+            this.newTrac.UsePlace = ""
+            this.newTrac.CreateDate = ""
+          }
+    )
+
     },
     addRule(bvModalEvent) {
       bvModalEvent.preventDefault()
@@ -227,6 +339,7 @@ export default {
       this.newRule.ValFloat = 0;
       this.newRule.FieldName = null;
       this.newRule.Val = null;
+      this.$http.post("http://localhost:8089/api/v1/rules", sending).then()
     },
     handleResize() {
       this.browserWidth = window.innerWidth
@@ -238,8 +351,20 @@ export default {
     onSelectionChanged() {
       const selectedRows = this.gridApi.getSelectedRows();
       if (selectedRows[0] !== undefined) {
-        this.selectedTracID = selectedRows[0].id;
-        this.selectedTracName = selectedRows[0].name;
+        this.selectedTracID = selectedRows[0].ID;
+        this.selectedTracName = selectedRows[0].Name;
+        console.log("Starting connection to WebSocket Server")
+        if (this.connection != null) {
+          this.connection.close()
+        }
+        this.connection = new WebSocket("ws://localhost:8089/api/v1/info/"+this.selectedTracID)
+        this.connection.onmessage = (event) => {
+          this.setInfo(event.data)
+        }
+        this.connection.onopen = function(event) {
+          console.log(event)
+          console.log("Successfully connected to the echo websocket server...")
+        }
       }
     },
   }
@@ -262,7 +387,7 @@ export default {
 
 .tracInfo {
   margin-left: 50px;
-  width: 75vw;
+
 }
 .upper-r-table {
   display: flex;
@@ -277,6 +402,11 @@ export default {
 }
 .upper-r-table-button:hover {
   box-shadow: 5px 5px 10px 0 #ce2a2e;
+}
+.infoField {
+  width: 100%;
+  border-bottom: #ce2a2e 1px solid;
+  margin-bottom: 20px;
 }
 .inputField {
   margin-bottom: 5px;
