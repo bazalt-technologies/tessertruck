@@ -288,7 +288,7 @@ export default {
     addTrac(bvModalEvent) {
       bvModalEvent.preventDefault()
       this.showAddTracModal = false
-      this.$http.post("http://server:8089/api/v1/tractors", this.newTrac).then(
+      this.$http.post("http://server:8085/api/v1/tractors", this.newTrac).then(
           // eslint-disable-next-line no-unused-vars
           response=> {
             this.newTrac.ID = 0
@@ -339,7 +339,7 @@ export default {
       this.newRule.ValFloat = 0;
       this.newRule.FieldName = null;
       this.newRule.Val = null;
-      this.$http.post("http://server:8089/api/v1/rules", sending).then()
+      this.$http.post("http://server:8085/api/v1/rules", sending).then()
     },
     handleResize() {
       this.browserWidth = window.innerWidth
@@ -357,7 +357,7 @@ export default {
         if (this.connection != null) {
           this.connection.close()
         }
-        this.connection = new WebSocket("ws://server:8089/api/v1/info/"+this.selectedTracID)
+        this.connection = new WebSocket("ws://server:8085/api/v1/info/"+this.selectedTracID)
         this.connection.onmessage = (event) => {
           this.setInfo(event.data)
         }
