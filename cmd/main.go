@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 	"os"
 	"tracflow/pkg/api"
@@ -20,8 +21,10 @@ func main() {
 	serverPort := os.Getenv("SERVER_PORT")
 	s, err := storage.New(fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", dbHost, dbPort, dbUser, dbPassword, dbName))
 	if err != nil {
+		log.Println(err.Error())
 		return
 	}
+	s.Init()
 	a := api.New(mux.NewRouter(), websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,

@@ -9,7 +9,6 @@ services:
       - POSTGRES_PASSWORD="test"
       - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ../2. Init Database:/docker-entrypoint-initdb.d
       - .:/var/lib/postgresql/data
     ports:
       - "5430:5432"
@@ -23,7 +22,7 @@ services:
   server:
     build: .
     ports:
-      - "8082:8082"
+      - "8085:8085"
     restart: always
     environment:
       DB_NAME: "truck"

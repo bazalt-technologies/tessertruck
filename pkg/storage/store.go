@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"io/ioutil"
 	"log"
 	"sync"
 )
@@ -28,4 +29,16 @@ func intToInt32Array(in []int) []int32 {
 		out = append(out, int32(val))
 	}
 	return out
+}
+
+func (s *Store) Init() {
+	dat, err := ioutil.ReadFile("../pkg/SQL/schema.sql")
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	_, err = s.pool.Exec(context.Background(), string(dat))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
