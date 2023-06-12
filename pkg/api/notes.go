@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 )
@@ -10,10 +9,8 @@ import (
 func (api *API) NotesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		vars := mux.Vars(r)
-		idString := vars["tractor_id"]
-		id, err := strconv.Atoi(idString)
-		if err != nil {
+		id, err := strconv.Atoi(r.URL.Query().Get("tractorID"))
+		if err != nil || id == 0 {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}

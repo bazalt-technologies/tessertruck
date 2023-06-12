@@ -14,7 +14,7 @@
       <ag-grid-vue
           class="ag-theme-balham"
           :columnDefs="columns"
-          :rowData="rows"
+          :rowData="tractors"
           :rowSelection="rowSelection"
           style="width: 682px"
           @selection-changed="onSelectionChanged()"
@@ -24,7 +24,7 @@
   </div>
 
   <!-- Правая панель с информацией по трактору -->
-  <div class="tracInfo" v-if=" selectedTracID !== '' ">
+  <div class="tracInfo" v-if="selectedTracID">
     <div class="upper-r-table">
 
       <div class="title" v-if="browserWidth > 1380">
@@ -38,7 +38,7 @@
         >
           <b-icon-plus-circle/> Добавить правило
         </b-button>
-        <b-button variant="danger" class="upper-r-table-button">
+        <b-button variant="danger" class="upper-r-table-button" @click="downloadJournal">
           <b-icon-journal-text/> Журнал нарушений
         </b-button>
 
@@ -106,24 +106,24 @@
     <b-alert variant="danger" :show="badInput">Все поля должны быть заполнены</b-alert>
     <b-form-input
         placeholder="Название"
-        v-model="newTrac.Name"
+        v-model="tracName"
         class="inputField"
     />
     <b-form-datepicker
         placeholder="Дата создания"
-        v-model="newTrac.CreateDate"
+        v-model="createDate"
         class="inputField"
         locale="ru"
     />
     <b-form-datepicker
       placeholder="В эксплуатации с"
-      v-model="newTrac.UseDate"
+      v-model="useDate"
       class="inputField"
       locale="ru"
     />
     <b-form-input
         placeholder="Место эксплуатации"
-        v-model="newTrac.UsePlace"
+        v-model="usePlace"
         class="inputField"
     />
   </b-modal>
@@ -154,15 +154,9 @@ export default {
       ValFloat: "",
       Val: null,
     },
-    newTrac: {
-      ID: 0,
-      Name: "",
-      CreateDate: "",
-      UseDate: "",
-      UsePlace: "",
-    },
+    newTrac: {},
     rowSelection: 'single',
-    selectedTracID: '',
+    selectedTracID: 0,
     selectedTracName: '',
     columns: [
       {field: "ID", headerName: 'Номер', sortable: true, width: 80},
@@ -172,11 +166,7 @@ export default {
       {field: "UsePlace", headerName: 'Место эксплуатации', sortable: true, width: 150},
 
     ],
-    rows: [
-      {ID: 1, Name: 'Трактор', CreateDate: "10.05.2023", UseDate: "15.05.2023", UsePlace: "Тут"},
-      {ID: 2, Name: 'Кировец', CreateDate: "05.07.2019", UseDate: "29.07.2019", UsePlace: "Там"},
-      {ID: 3, Name: 'Череповец', CreateDate: "12.12.2020", UseDate: "20.01.2021", UsePlace: "Сям"},
-    ],
+    tractors: [],
     selectField: [
       {value: null, text: "Выберите поле"},
       {value: "SpeedRT", text: "Скорость"},
@@ -234,16 +224,70 @@ export default {
     browserWidth: 0,
     browserHeight: 0,
   }},
+  computed: {
+    createDate: {
+      get() {
+        if (!this.newTrac) {
+          return ""
+        }
+        return this.newTrac.CreateDate
+      },
+      set(val) {
+        this.newTrac.CreateDate = val
+      }
+    },
+    useDate: {
+      get() {
+        if (!this.newTrac) {
+          return ""
+        }
+        return this.newTrac.UseDate
+      },
+      set(val) {
+        this.newTrac.UseDate = val
+      }
+    },
+    tracName: {
+      get() {
+        if (!this.newTrac) {
+          return ""
+        }
+        return this.newTrac.Name
+      },
+      set(val) {
+        this.newTrac.Name = val
+      }
+    },
+    usePlace: {
+      get() {
+        if (!this.newTrac) {
+          return ""
+        }
+        return  this.newTrac.UsePlace
+      },
+      set(val) {
+        this.newTrac.UsePlace = val
+      }
+    }
+  },
   created() {
     window.addEventListener('resize', this.handleResize)
     this.handleResize()
+    this.getData()
 
   },
   onUnmounted() {
     window.removeEventListener('resize', this.handleResize)
   },
   methods: {
-
+    getData() {
+      this.$http.get("http://localhost:8085/api/v1/tractors").then(
+          // eslint-disable-next-line no-unused-vars
+          response=> {
+            this.tractors = response && response.data ? response.data : []
+            // eslint-disable-next-line no-unused-vars
+          })
+    },
     isIn(arr, str) {
       for (let i = 0; i < arr.length; i++) {
         if (str === arr[i]) {
@@ -264,7 +308,6 @@ export default {
       this.rowsInfo.EnvTemperature = someData.Teledata.EnvTemperature
       this.rowsInfo.RedLamp = someData.Teledata.RedLamp
       this.rowsInfo.WarnLamp = someData.Teledata.WarnLamp
-      console.log(someData)
     },
     isNumber(str) {
       if (str === null || str.length === 0) {
@@ -288,21 +331,11 @@ export default {
     addTrac(bvModalEvent) {
       bvModalEvent.preventDefault()
       this.showAddTracModal = false
-      this.$http.post("http://server:8085/api/v1/tractors", this.newTrac).then(
+      this.$http.post("http://localhost:8085/api/v1/tractors", this.newTrac).then(
           // eslint-disable-next-line no-unused-vars
           response=> {
-            this.newTrac.ID = 0
-            this.newTrac.Name = ""
-            this.newTrac.UseDate = ""
-            this.newTrac.UsePlace = ""
-            this.newTrac.CreateDate = ""
+            this.newTrac = {}
             // eslint-disable-next-line no-unused-vars
-          }, err=> {
-            this.newTrac.ID = 0
-            this.newTrac.Name = ""
-            this.newTrac.UseDate = ""
-            this.newTrac.UsePlace = ""
-            this.newTrac.CreateDate = ""
           }
     )
 
@@ -329,17 +362,16 @@ export default {
         Name: this.newRule.Name,
         TractorID: this.selectedTracID,
         FieldName: this.newRule.FieldName,
-        ValInt: this.newRule.ValInt,
-        ValFloat: this.newRule.ValFloat,
+        ValInt: this.newRule.ValInt || 0,
+        ValFloat: this.newRule.ValFloat || 0,
       }
-      console.log("Sending: ", sending)
       this.showAddRuleModal = false
       this.newRule.Name = "";
       this.newRule.ValInt = 0;
       this.newRule.ValFloat = 0;
       this.newRule.FieldName = null;
       this.newRule.Val = null;
-      this.$http.post("http://server:8085/api/v1/rules", sending).then()
+      this.$http.post("http://localhost:8085/api/v1/rules", sending).then()
     },
     handleResize() {
       this.browserWidth = window.innerWidth
@@ -357,15 +389,27 @@ export default {
         if (this.connection != null) {
           this.connection.close()
         }
-        this.connection = new WebSocket("ws://server:8085/api/v1/info/"+this.selectedTracID)
+        this.connection = new WebSocket("ws://localhost:8085/api/v1/info/"+this.selectedTracID)
         this.connection.onmessage = (event) => {
           this.setInfo(event.data)
         }
-        this.connection.onopen = function(event) {
-          console.log(event)
-          console.log("Successfully connected to the echo websocket server...")
-        }
-      }
+       }
+    },
+    downloadJournal() {
+      this.$http.get("http://localhost:8085/api/v1/notes", {params: {
+        tractorID: this.selectedTracID
+        }}).then(
+          // eslint-disable-next-line no-unused-vars
+          response=> {
+            const notes = response && response.data ? response.data : {}
+            const a = document.createElement("a");
+            const data = JSON.stringify(notes, null, '\t')
+            const file = new Blob([data], {type: 'text/html'});
+            a.href = URL.createObjectURL(file);
+            a.download = `Журнал нарушений для ${this.wsData.Name}.txt`;
+            a.click();
+            // eslint-disable-next-line no-unused-vars
+          })
     },
   }
 }

@@ -19,11 +19,12 @@ func New(r *mux.Router, u websocket.Upgrader, store *storage.Store) *API {
 
 func (api *API) Handle() {
 	api.r.HandleFunc("/api/v1/info/{id}", api.InfoHandler)
-	api.r.HandleFunc("/api/v1/rules/{tractor_id}", api.RulesHandler).Methods(http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete)
-	api.r.HandleFunc("/api/v1/rules", api.RulesHandler).Methods(http.MethodPost, http.MethodPatch, http.MethodDelete)
-	api.r.HandleFunc("/api/v1/notes/{tractor_id}", api.NotesHandler).Methods(http.MethodGet)
-	api.r.HandleFunc("/api/v1/notes", api.NotesHandler).Methods(http.MethodPost, http.MethodPatch, http.MethodDelete)
-	api.r.HandleFunc("/api/v1/tractors", api.TractorsHandler).Methods(http.MethodGet, http.MethodPost)
+	api.r.HandleFunc("/api/v1/rules/{tractorID}", api.RulesHandler).Methods(http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions)
+	api.r.HandleFunc("/api/v1/rules", api.RulesHandler).Methods(http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions)
+	api.r.HandleFunc("/api/v1/notes", api.NotesHandler).Methods(http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions)
+	api.r.HandleFunc("/api/v1/tractors", api.TractorsHandler).Methods(http.MethodGet, http.MethodPost, http.MethodOptions)
+
+	api.r.Use(api.HeadersMiddleware)
 }
 
 func (api *API) Listen(addr string) error {

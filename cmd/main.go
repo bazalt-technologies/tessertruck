@@ -33,5 +33,7 @@ func main() {
 		},
 	}, s)
 	a.Handle()
-	a.Listen(fmt.Sprintf("%s:%s", serverHost, serverPort))
+	if err = a.Listen(fmt.Sprintf("%s:%s", serverHost, serverPort)); err != nil {
+		log.Println(err.Error())
+	}
 }

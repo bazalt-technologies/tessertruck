@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS tractors (
     create_date TEXT NOT NULL DEFAULT '',
     use_date TEXT NOT NULL DEFAULT '',
     use_place TEXT NOT NULL DEFAULT '',
-    info jsonb
+    info JSONB NOT NULL DEFAULT '{"RedLamp": "false"}'::JSONB
 );
 
 CREATE TABLE IF NOT EXISTS rules (
