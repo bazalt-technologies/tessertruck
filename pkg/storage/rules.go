@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"log"
 	"tracflow/pkg/models"
 )
 
@@ -68,7 +67,6 @@ func (s *Store) UpdateRule(item models.Rule) (int, error) {
 	)
 
 	if err != nil {
-		log.Println(err.Error())
 		return 0, err
 	}
 	return item.ID, err
