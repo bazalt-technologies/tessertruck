@@ -24,4 +24,4 @@ new Vue({
   render: h => h(App),
 }).$mount('#app')
 
-export const url = "wss://localhost:8085"
+export const url = "ws://localhost:8085"

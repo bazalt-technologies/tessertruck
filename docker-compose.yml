@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: test
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
-      - "5430:5432"
+      - 5430:5432
   web:
     ports:
       - 8082:8082
@@ -21,15 +21,15 @@ services:
   server:
     build: .
     ports:
-      - "8085:8085"
+      - 8085:8085
     restart: always
     environment:
-      DB_NAME: "truck"
-      DB_PWD: "test"
-      DB_USER: "test"
-      DB_HOST: "database"
+      DB_NAME: truck
+      DB_PWD: test
+      DB_USER: test
+      DB_HOST: database
       DB_PORT: 5432
-      SERVER_HOST: "server"
+      SERVER_HOST: server
       SERVER_PORT: 8085
     depends_on:
       - database

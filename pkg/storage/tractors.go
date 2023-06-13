@@ -7,7 +7,7 @@ import (
 
 func (s *Store) GetTractors(ids []int) ([]models.Tractor, error) {
 	rows, err := s.pool.Query(context.Background(), `
-		SELECT id, name, create_date, use_date, use_place, info FROM tractors WHERE id = ANY($1) OR array_length($1,1) IS NULL`,
+		SELECT id, name, create_date, use_date, use_place FROM tractors WHERE id = ANY($1) OR array_length($1,1) IS NULL`,
 		intToInt32Array(ids),
 	)
 	defer rows.Close()
@@ -24,7 +24,6 @@ func (s *Store) GetTractors(ids []int) ([]models.Tractor, error) {
 			&item.CreateDate,
 			&item.UseDate,
 			&item.UsePlace,
-			&item.Teledata,
 		)
 		if err != nil {
 			return nil, err
