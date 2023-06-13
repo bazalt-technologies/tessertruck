@@ -1,6 +1,7 @@
 DELETE FROM rules;
 DELETE FROM notes;
 DELETE FROM tractors;
+ALTER SEQUENCE tractors_id_seq RESTART WITH 1;
 INSERT INTO tractors(id,
                      name,
                      create_date,
@@ -19,3 +20,4 @@ INSERT INTO tractors(id,
                      use_date,
                      use_place
                      ) VALUES (3, 'Кировец', '05.07.2019', '29.07.2019', 'Сельцо');
+ALTER SEQUENCE tractors_id_seq RESTART WITH 4;

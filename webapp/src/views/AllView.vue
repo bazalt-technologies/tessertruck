@@ -335,6 +335,7 @@ export default {
           // eslint-disable-next-line no-unused-vars
           response=> {
             this.newTrac = {}
+            this.getData()
             // eslint-disable-next-line no-unused-vars
           }
     )
