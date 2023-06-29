@@ -19,6 +19,15 @@ Vue.use(http, {
   baseUrl: Vue.prototype.$baseUrl
 })
 
+// Charts
+import VueApexCharts from 'vue-apexcharts'
+Vue.use(VueApexCharts)
+
+Vue.component('ApexChart', VueApexCharts)
+
+Vue.config.productionTip = false
+// Charts end
+
 new Vue({
   router,
   render: h => h(App),

@@ -52,6 +52,17 @@
     </div>
   </div>
 
+    <!-- График для параметров трактора -->
+    <div class="paramCharts">
+        <div class="oneChar"><ApexChart height="300" width="200" type="bar" :options="options1" :series="series1"></ApexChart></div>
+        <div class="oneChar"><ApexChart height="300" width="200" type="bar" :options="options2" :series="series2"></ApexChart></div>
+        <div class="oneChar"><ApexChart height="300" width="400" type="bar" :options="options3" :series="series3"></ApexChart></div>
+        <div class="oneChar"><ApexChart height="300" width="200" type="bar" :options="options4" :series="series4"></ApexChart></div>
+        <div class="oneChar"><ApexChart height="300" width="300" type="bar" :options="options5" :series="series5"></ApexChart></div>
+        <div class="oneChar"><ApexChart height="300" width="300" type="bar" :options="options6" :series="series6"></ApexChart></div>
+    </div>
+
+
 
 
 
@@ -141,6 +152,8 @@ export default {
     AgGridVue
   },
   data() {return {
+
+
     showAddRuleModal: false,
     showAddTracModal: false,
     connection: null,
@@ -156,7 +169,7 @@ export default {
     },
     newTrac: {},
     rowSelection: 'single',
-    selectedTracID: 0,
+    selectedTracID: 1,
     selectedTracName: '',
     columns: [
       {field: "ID", headerName: 'Номер', sortable: true, width: 80},
@@ -164,9 +177,9 @@ export default {
       {field: "CreateDate", headerName: 'Дата создания', sortable: true, width: 150},
       {field: "UseDate", headerName: 'В эксплуатации с', sortable: true, width: 150},
       {field: "UsePlace", headerName: 'Место эксплуатации', sortable: true, width: 150},
-
     ],
     tractors: [],
+      rules: [],
     selectField: [
       {value: null, text: "Выберите поле"},
       {value: "SpeedRT", text: "Скорость"},
@@ -223,6 +236,24 @@ export default {
     },
     browserWidth: 0,
     browserHeight: 0,
+
+      options1: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Скорость"]}, yaxis: {min: 0, max: 100, forceNiceScale: false}},
+      series1: [{name: 'Скорость', data: [0]}],
+
+      options2: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Обороты"]}, yaxis: {min: 0, max: 6000, forceNiceScale: false}},
+      series2: [{name: 'Обороты', data: [0]}],
+
+      options3: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Уровень топлива", "Потрачено топлива", "Расход топлива"]}, yaxis: {max: 100, forceNiceScale: false}},
+      series3: [{name: 'Топливо', data: [0, 0, 0]}],
+
+      options4: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Режим двигателя"]}, yaxis: {min: 0, max: 4, forceNiceScale: false}},
+      series4: [{name: 'Режим двигателя', data: [0]}],
+
+      options5: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Темп. масла", "Внешняя темп."]}, yaxis: {min: 0, max: 50, forceNiceScale: false}},
+      series5: [{name: 'Температура', data: [0, 0]}],
+
+      options6: {chart: {id: 'vuechart-example'}, colors: "#ce2a2e", xaxis: {categories: ["Красный индикатор", "Жёлтый индикатор"]}, yaxis: {min: 0, max: 1, forceNiceScale: false}},
+      series6: [{name: 'Индикаторы', data: [0, 0]}],
   }},
   computed: {
     createDate: {
@@ -308,7 +339,32 @@ export default {
       this.rowsInfo.EnvTemperature = someData.Teledata.EnvTemperature
       this.rowsInfo.RedLamp = someData.Teledata.RedLamp
       this.rowsInfo.WarnLamp = someData.Teledata.WarnLamp
+
+        this.series1 =  [{data: [someData.Teledata.SpeedRT]}]
+        this.series2 =  [{data: [someData.Teledata.EngineRPS]}]
+        this.series3 =  [{data: [someData.Teledata.FuelLevel, someData.Teledata.FuelSpent, someData.Teledata.FuelConsumption]}]
+        this.series4 =  [{data: [someData.Teledata.EngineRegime]}]
+        this.series5 =  [{data: [someData.Teledata.OilTemperature, someData.Teledata.EnvTemperature]}]
+        this.series6 =  [{data: [someData.Teledata.RedLamp, someData.Teledata.WarnLamp]}]
+
+        this.setRules()
+
+
+
+
     },
+      setRules() {
+          this.$http.get("http://localhost:8085/api/v1/rules", {params: {
+                  tractorID: this.selectedTracID
+              }}).then(
+              response=> {
+                 this.rules = response && response.data ? response.data : []
+              })
+      },
+
+      changeChartsColor() {
+
+      },
     isNumber(str) {
       if (str === null || str.length === 0) {
         return false
@@ -459,6 +515,18 @@ export default {
 .ag-theme-balham {
   --ag-header-background-color: #ce2a2e;
   --ag-header-foreground-color: #ffffff;
-  height: calc(80vh - 70px)
+  height: calc(80vh - 250px)
 }
+.paramCharts {
+    margin-top: 50px;
+    margin-left: 0px;
+    top: 300px;
+}
+
+.oneChar {
+    display: inline-block;
+}
+
+
+
 </style>

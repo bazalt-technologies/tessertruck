@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 	"tracflow/pkg/models"
@@ -11,9 +10,10 @@ import (
 func (api *API) RulesHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		vars := mux.Vars(r)
-		idString := vars["tractor_id"]
-		id, err := strconv.Atoi(idString)
+		//vars := mux.Vars(r)
+		//idString := vars["tractor_id"]
+		//id, err := strconv.Atoi(idString)
+		id, err := strconv.Atoi(r.URL.Query().Get("tractorID"))
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			return
